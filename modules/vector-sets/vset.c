@@ -152,7 +152,9 @@ struct vsetObject {
                                 // object is still the same.
     uint64_t numattribs;        // Number of nodes associated with an attribute.
     atomic_int thread_creation_pending; // Number of threads that are currently
-                                        // pending to lock the object.
+
+    double lat;                        //GEO metadata
+    double lon;                        //GEO metadata
 };
 
 /* Each node has two associated values: the associated string (the item
@@ -739,6 +741,12 @@ int VADD_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             vec = projected;
             dim = vset->hnsw->vector_dim;
         }
+        if (geo_filter_enabled) {
+            if (!in_radius(query_lat, query_lon, vector->lat, vector->lon, radius_km)) {
+                continue;or
+            }
+    }
+    
     }
 
     /* For existing keys don't do CAS updates. For how things work now, the
